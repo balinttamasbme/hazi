@@ -1,12 +1,18 @@
 #include <iostream>
+#include <fstream>
 #include "kapuk.h"
 
 using namespace std;
 
 int main() {
     
-    Input a = Input('A', 0);
-    a.printInput();
-    
+    ofstream myfile;
+
+    myfile.open ("diagram.txt");
+    char a = 'A';
+    char b = 'B';
+    myfile << "digraph{" << a << "->" << b <<"}";
+
+    myfile.close();
     return 0;
 }
