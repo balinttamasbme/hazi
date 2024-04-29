@@ -12,7 +12,7 @@ int main() {
     char a = 'A';
     char b = 'B';
     myfile << "digraph{" << a << "->" << b <<"}";
-    court << "kuki";
+    cout << "kuki";
     myfile.close();
     return 0;
 }
