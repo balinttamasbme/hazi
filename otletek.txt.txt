@@ -1,0 +1,5 @@
+kapuk: AND, NAND, OR, NOR, XOR, NOT
+operátorok ezekhez
+
+Karnaugh tábla kiírása
+Diszjunktí/konjuktív alak
