@@ -1,27 +1,54 @@
-#ifndef KAPUK_H
-#define KAPUK_H
+#pragma once
 
 #include <iostream>
-
-using namespace std;
+#include <vector>
 
 class Input {
     char inputName;
-    int value;
+    bool value;
     public:
-        Input(char const n,int const v) {inputName = n; v > 1 || v < 0 ? value = -1 : value = v;}
+        Input(char const n,int const v) {inputName = n; value = 0;}
 
         char getInputName() const {return inputName;}
         int getValue() const {return value;}
         void printInput() const;
-};
+
+};  
 
 class Kapu {
     private:
-        char gateName[5];
-        int inputNum;
+        char name[5];
+        std::vector<Kapu const&> inputs;
         bool inputValue[4];
+        /* std::vector<const Kapu&> inputs;
+            
+            bool output;
+            char type; //pl. '*', '+'
+            void setOutput()
+            {
+                switch (type):
+                    case '*':
+                        for 
+        
+        A B C D
+        0 1 1 0
+            }
+        */
     public:
+        void addInput(Kapu const &in) {
+            inputs.push_back(in);
+        }
+
+        void printInput() const{
+            std::cout<< "fasz";
+        }
+
+        void print() {
+            for (const Kapu& input : inputs) {
+                input.printInput();
+            }
+            
+        }
 };
 
 bool operator + (Input const &a, Input const &b) {
@@ -41,5 +68,3 @@ class Nor : Kapu{};
 
 class Not : Kapu{};
 */
-
-#endif

@@ -1,1 +1,1 @@
-digraph{A->B}
+digraph{B->C->A B->A C->A}
