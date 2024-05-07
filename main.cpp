@@ -2,7 +2,7 @@
 #include <fstream>
 #include "kapuk.h"
 
-using namespace std;
+using namespace std; 
 
 int main() {
     
