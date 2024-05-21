@@ -40,7 +40,7 @@ class Kapu {
         }
 
         void printInput() const{
-            std::cout<< "fasz";
+            std::cout<< "asdasd";
         }
 
         void print() {
