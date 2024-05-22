@@ -52,6 +52,22 @@
  * 
  * A kapott integert egy "size" bites bináris számmá alakítja. Az num bitjeivel össze "és"-eli az 1-et így megkapjuk, a num-ot binárisan.
  * 
+ * \subsection step8 8. bool valueOfBrace(const std::string &brace)
+ * 
+ * A kapott zárójeles műveletről mondja meg, hogy igaz-e vagy hamis.
+ * 
+ * \subsection step9 9. bool evaluateOperation(const std::string &binaryValue, const std::vector<char> &variables, const std::string &operation)
+ * 
+ * A teljes függvényt kiértékeli egy adott bemeneti kombinációra. Több segédfüggvényt felhasznál ehhez.
+ * 
+ * \subsection step10 10. void createTable(const std::string &input, const std::string &ofName)
+ * 
+ * Mindent felhasználva ez adja meg minden bemeneti kombinációra a függvény értékét, majd ezt egy, a felhasználó által megadott file-ba kiírja.
+ * 
+ * \subsection step10 11.
+ * 
+ * A teljes függvényt kiértékeli egy adott bemeneti kombinációra. Több segédfüggvényt felhasznál ehhez.
+ * 
  * \section use_sec Használat:
  * Mintabemenetek: \n
  * (A*B) \n 
@@ -119,7 +135,6 @@ Gate* createGate(const std::string &input) {
     }
 
     std::stringstream ss(workString);
-
     while (ss >> idIn) {
         ret->inputs.push_back(gateStack[idIn]);
     }
@@ -336,20 +351,21 @@ bool evaluateOperation(const std::string &binaryValue, const std::vector<char> &
     return (bool)(workString[0]-'0');
 }
 
-bool createTable(const std::string &input, const std::string &ofName) {
+void createTable(const std::string &input, const std::string &ofName) {
     std::string workString = input;
     std::vector<char> variables;
 
     std::ofstream ofStream;
     ofStream.open(ofName);
 
+    /**/
     for (char a : workString) {
         if (a >= 'A' && a <= 'Z' && !doesInclude(variables, a)) {
             variables.push_back(a);
         }
     }
     
-    //bubble sort
+    //bubble sort, az ABC-ben legelöl lévő változó az MSB pl:'A'.
     for (int i = 0; i < variables.size() - 1; i++) {
         for (int j = 0; j < variables.size()- i - 1; j++) {
             if (variables[j] > variables[j + 1]) {
@@ -377,8 +393,6 @@ bool createTable(const std::string &input, const std::string &ofName) {
     }
 
     ofStream.close();
-    
-    return 0;
 }
 
 /*----------------------------------------------------*/
