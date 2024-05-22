@@ -18,4 +18,4 @@ or.o: or.cpp
 	g++ -c or.cpp
 
 clean:
-	del *.o main.exe
+	del *.o *.dot *.txt main.exe

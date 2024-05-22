@@ -1,10 +1,6 @@
 #include "or.h"
 #include <iostream>
 
-void Or::printType() const{
-    std::cout << "Or" << std::endl;
-}
-
 void Or::printInputs() const {
     std::cout << "ID:" << id << std::endl;
     for (const Gate* a : inputs) {

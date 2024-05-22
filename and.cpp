@@ -8,10 +8,6 @@ void And::printInputs() const{
     }
 }
 
-void And::printType() const{
-    std::cout << "And" << std::endl;
-}
-
 void And::printToFile(std::ofstream& of) {
     of << "\t" << id << "[shape=box width=0.4 height=0.7 label=\"&\"]" << std::endl;
     for (Gate* a : inputs) {

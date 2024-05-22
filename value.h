@@ -12,6 +12,5 @@ public:
     void setData(char d){data = d;}
 
     void printInputs() const override;
-    void printType() const override;
     void printToFile(std::ofstream&) override;
 };

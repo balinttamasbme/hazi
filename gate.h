@@ -16,7 +16,6 @@ public:
     int getId() const {return id;}
 
     virtual void printInputs() const;
-    virtual void printType()const;
     virtual void printToFile(std::ofstream&);
     
     virtual ~Gate() = default;
