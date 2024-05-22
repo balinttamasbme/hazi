@@ -18,5 +18,5 @@ public:
     virtual void printInputs() const;
     virtual void printToFile(std::ofstream&);
     
-    virtual ~Gate() = default;
+    virtual ~Gate() {delete[] &inputs;};
 };

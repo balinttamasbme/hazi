@@ -22,4 +22,4 @@ $(OUTFILE): $(OBJECTS)
 	$(CC) $(CFLAGS) -c $<
 
 clean:
-	rm -f $(OUTFILE) $(OBJECTS)
+	del -f *.o *.dot main.exe output.txt

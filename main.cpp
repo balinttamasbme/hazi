@@ -112,6 +112,7 @@ Gate* createInput(const std::string &input) {
         gateStack.push_back(ret);
         return ret;
     }
+
     return nullptr;
 }
 
@@ -308,17 +309,18 @@ bool evaluateOperation(const std::string &binaryValue, const std::vector<char> &
     for(unsigned i = 0; i < workString.length(); i++) {
         for (unsigned z = 0; z < variables.size(); z++) {
             if (workString[i] == variables[z]) {
+                
                 workString[i] = binaryValue[z];
-            }
-
-            if (workString[i-1] == '!') {
-                if (workString[i] == '0') {
-                    workString[i] = '1';
-                } else {
-                    workString[i] = '0';
+                
+                if (workString[i-1] == '!') {
+                    if (workString[i] == '0') {
+                        workString[i] = '1';
+                    } else {
+                        workString[i] = '0';
+                    }
+                    workString.erase(i - 1, 1);
+                    i -= 1;
                 }
-                workString.erase(i - 1, 1);
-                i -= 1;
             }
         }
     }
@@ -331,6 +333,7 @@ bool evaluateOperation(const std::string &binaryValue, const std::vector<char> &
         }
         
         std::string subOp;
+        std::string subOpValue;
         
         int closeBracId = -1;
         int openBracId = -1;
@@ -345,13 +348,11 @@ bool evaluateOperation(const std::string &binaryValue, const std::vector<char> &
         for (int a = 0; a + openBracId < closeBracId + 1; a++) {
             subOp += workString[a + openBracId];
         }
-        
+
         if (openBracId != -1 && closeBracId != -1) {
             workString.replace(openBracId, closeBracId - openBracId + 1, std::to_string(valueOfBrace(subOp)));
             i = i - (closeBracId - openBracId + 1);
         }
-
-        //std::cout << workString << std::endl;
 
         i++;
     }
@@ -405,14 +406,8 @@ void createTable(const std::string &input, const std::string &ofName) {
 /*----------------------------------------------------*/
 
 void freeStack() {
-    std::vector<Gate *> gateStack;
-
     for (Gate* a : gateStack) {
         delete[] a;
-    }
-
-    for (std::string a : stringStack) {
-        delete[] &a;
     }
 }
 
@@ -436,20 +431,20 @@ bool checkInput(const std::string &input){
 }
 
 int main() {
-    std::string function; 
+    std::string function = "(!A*B)"; 
     std::string graphFile = "dot.dot"; 
     std::string tableFile = "output.txt"; 
 
-    std::cout << "Kerem adja meg a halozat fuggvenyet: " << std::endl;
-    std::cin >> function; 
+    //std::cout << "Kerem adja meg a halozat fuggvenyet: " << std::endl;
+    //std::cin >> function; 
 
-    std::cout << "Kerem adja meg a graf celfajlanak nevet: " << std::endl;
+    /*std::cout << "Kerem adja meg a graf celfajlanak nevet: " << std::endl;
     std::cin >> graphFile; 
     graphFile += ".dot";
 
     std::cout << "Kerem adja meg az igazsagtabla celfajlanak nevet: " << std::endl;
     std::cin >> tableFile; 
-    tableFile += ".txt";
+    tableFile += ".txt";*/
 
     printGraph(graphFile, createSystem(function));
 

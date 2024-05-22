@@ -62,6 +62,14 @@
         "xmemory": "cpp",
         "xstring": "cpp",
         "xtr1common": "cpp",
-        "xutility": "cpp"
+        "xutility": "cpp",
+        "bitset": "cpp",
+        "list": "cpp",
+        "map": "cpp",
+        "optional": "cpp",
+        "regex": "cpp",
+        "iomanip": "cpp",
+        "xhash": "cpp",
+        "xtree": "cpp"
     }
 }
