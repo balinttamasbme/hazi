@@ -64,11 +64,15 @@
  * 
  * Mindent felhasználva ez adja meg minden bemeneti kombinációra a függvény értékét, majd ezt egy, a felhasználó által megadott file-ba kiírja.
  * 
- * \subsection step10 11.
+ * \subsection step11 11. void freeStack()
  * 
- * A teljes függvényt kiértékeli egy adott bemeneti kombinációra. Több segédfüggvényt felhasznál ehhez.
+ * A dinamikusan foglalt tömb elemeit törli.
  * 
  * \section use_sec Használat:
+ * 
+ * \subsection step12 1. Függvény
+ * A bemenetként egy zárójelezett bemenet kell legyen, minden szint külön zárójelet igényel.
+ * 
  * Mintabemenetek: \n
  * (A*B) \n 
  * ((A*B)+(C*D)+E) \n
@@ -82,18 +86,17 @@
 #include <vector>
 #include <algorithm>
 #include <sstream>
-#include <bitset>
 #include <cmath>
 #include <string>
-
 #include "gate.h"
 #include "or.h"
 #include "and.h"
 #include "value.h"
+#include "memtrace.h"
+
 
 std::vector<std::string> stringStack;
 std::vector<Gate *> gateStack;
-
 
 Gate* createInput(const std::string &input) {
     std::string toValue;
@@ -109,6 +112,7 @@ Gate* createInput(const std::string &input) {
         gateStack.push_back(ret);
         return ret;
     }
+    return nullptr;
 }
 
 Gate* createGate(const std::string &input) {
@@ -144,7 +148,7 @@ Gate* createGate(const std::string &input) {
 
 bool containOper(const std::string &in) {
     for(char a : in) {
-        if (a = '*' || '+') {
+        if (a == '*' || a == '+') {
             return true;
         }
     }
@@ -155,7 +159,7 @@ Gate* createSystem(const std::string &input) {
     std::string workString = input;
     std::string inputValue;
     
-    for(int i = 0; i < workString.length(); i++) {
+    for(unsigned i = 0; i < workString.length(); i++) {
         if (workString[i] >= 'A' && workString[i] <= 'Z') {
             if (i > 0 && workString[i-1] == '!') {
                 inputValue = workString[i-1];
@@ -170,7 +174,7 @@ Gate* createSystem(const std::string &input) {
     }
     
     while (containOper(workString)) {
-        int i = 0;
+        unsigned i = 0;
 
         if (workString[0] != '(') {
             break;
@@ -294,14 +298,15 @@ bool valueOfBrace(const std::string &brace) {
     default:
         break;
     }
+    return true;
 }
 
 bool evaluateOperation(const std::string &binaryValue, const std::vector<char> &variables, const std::string &operation) {
     
     std::string workString = operation;
 
-    for(int i = 0; i < workString.length(); i++) {
-        for (int z = 0; z < variables.size(); z++) {
+    for(unsigned i = 0; i < workString.length(); i++) {
+        for (unsigned z = 0; z < variables.size(); z++) {
             if (workString[i] == variables[z]) {
                 workString[i] = binaryValue[z];
             }
@@ -313,13 +318,13 @@ bool evaluateOperation(const std::string &binaryValue, const std::vector<char> &
                     workString[i] = '0';
                 }
                 workString.erase(i - 1, 1);
-                i-=1;
+                i -= 1;
             }
         }
     }
 
     while (containOper(workString)) {
-        int i = 0;
+        unsigned i = 0;
 
         if (workString[0] != '(') {
             break;
@@ -346,6 +351,8 @@ bool evaluateOperation(const std::string &binaryValue, const std::vector<char> &
             i = i - (closeBracId - openBracId + 1);
         }
 
+        //std::cout << workString << std::endl;
+
         i++;
     }
     return (bool)(workString[0]-'0');
@@ -366,8 +373,8 @@ void createTable(const std::string &input, const std::string &ofName) {
     }
     
     //bubble sort, az ABC-ben legelöl lévő változó az MSB pl:'A'.
-    for (int i = 0; i < variables.size() - 1; i++) {
-        for (int j = 0; j < variables.size()- i - 1; j++) {
+    for (unsigned i = 0; i < variables.size() - 1; i++) {
+        for (unsigned j = 0; j < variables.size()- i - 1; j++) {
             if (variables[j] > variables[j + 1]) {
                 char temp = variables[j];
                 variables[j] = variables[j + 1];
@@ -383,7 +390,7 @@ void createTable(const std::string &input, const std::string &ofName) {
     }
     ofStream << "|\tF" << std::endl << std::endl;
 
-    for (int i = 0; i < pow(2, varNum); i++) {
+    for (unsigned i = 0; i < pow(2, varNum); i++) {
         std::string binaryNum = toBinary(i, varNum);
         for (int m = 0; m < varNum; m++) {
             ofStream << binaryNum[m] << "\t";
@@ -397,7 +404,7 @@ void createTable(const std::string &input, const std::string &ofName) {
 
 /*----------------------------------------------------*/
 
-void freeStack(){
+void freeStack() {
     std::vector<Gate *> gateStack;
 
     for (Gate* a : gateStack) {
@@ -409,23 +416,46 @@ void freeStack(){
     }
 }
 
+bool checkInput(const std::string &input){
+    int openBrac = 0;
+    int closeBrac = 0;
+
+    for(const char a : input){
+        if (a == '(') {
+            openBrac++;
+        } else if (a == ')') {
+            closeBrac++;
+        }
+    }
+
+    if (openBrac != closeBrac) {
+        return false;
+    }
+
+    return true;
+}
+
 int main() {
-    std::string function;
-    std::string graphFile;
-    std::string tableFile;
+    std::string function; 
+    std::string graphFile = "dot.dot"; 
+    std::string tableFile = "output.txt"; 
 
     std::cout << "Kerem adja meg a halozat fuggvenyet: " << std::endl;
-    std::cin >> function;
+    std::cin >> function; 
 
     std::cout << "Kerem adja meg a graf celfajlanak nevet: " << std::endl;
-    std::cin >> graphFile;
+    std::cin >> graphFile; 
+    graphFile += ".dot";
 
-    std::cout << "Kerem adja meg a graf celfajlanak nevet: " << std::endl;
-    std::cin >> tableFile;
+    std::cout << "Kerem adja meg az igazsagtabla celfajlanak nevet: " << std::endl;
+    std::cin >> tableFile; 
+    tableFile += ".txt";
 
     printGraph(graphFile, createSystem(function));
 
     createTable(function, tableFile);
+
+    freeStack();
 
     return 0;
 }

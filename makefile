@@ -1,21 +1,25 @@
-main: main.o gate.o and.o or.o value.o
-	g++ main.o gate.o and.o or.o value.o -o main
+# Compiler to use
+CC = g++
 
-main.o: main.cpp
-	g++ -c main.cpp
+# Compiler flags
+CFLAGS = -Wall -DMEMTRACE -std=c++11
 
-gate.o: gate.cpp
-	g++ -c gate.cpp
+# Name of the output file
+OUTFILE = main
 
-value.o: value.cpp
-	g++ -c value.cpp
+# Source files
+SOURCES = main.cpp gate.cpp or.cpp and.cpp value.cpp memtrace.cpp
 
+# Object files
+OBJECTS = $(SOURCES:.cpp=.o)
 
-and.o: and.cpp
-	g++ -c and.cpp
+all: $(OUTFILE)
 
-or.o: or.cpp
-	g++ -c or.cpp
+$(OUTFILE): $(OBJECTS)
+	$(CC) $(CFLAGS) -o $(OUTFILE) $(OBJECTS)
+
+%.o: %.cpp
+	$(CC) $(CFLAGS) -c $<
 
 clean:
-	del *.o *.dot *.txt main.exe
+	rm -f $(OUTFILE) $(OBJECTS)
