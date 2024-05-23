@@ -6,7 +6,10 @@
 class Value : public Gate {
     std::string data;
 public:
+    //a shift operátorhoz kell
     Value(){parameters = "[shape=plaintext width=0.1 height=0.1 label=\"";};
+    
+    //ez lesz az az érték, ami a gráfon címkeként majd megjelenik
     Value(std::string a): Gate(){
         data = a;
         parameters = "[shape=plaintext width=0.1 height=0.1 label=\"";

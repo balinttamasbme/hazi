@@ -15,11 +15,12 @@ public:
     Gate(){id = idBase++;}
     ~Gate() {delete[] &inputs;};
     
+    //az algoritmusok helyes működéséhez elengedhetetlen
     int getId() const {return id;}
     std::string getParameters() const{return parameters;}
 
     virtual void printToFile(std::ofstream&);
 
 };
-
+//fájlba printeléshez
 std::ofstream& operator<<(std::ofstream&, Gate*);

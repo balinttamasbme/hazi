@@ -11,6 +11,10 @@
  * 3. "((5+6)*4)" \n
  * 4. "(7*4)" \n
  * 
+ * \section github_repo Github Repository
+ * 
+ * Itt található a teljes kód: 
+ * 
  * Az igazságérték kiértékelése is hasonlóan történik, csak ott id-k helyett az igazságértékeket helyettesítem be. Ezeket az igazságértékeket úgy kapom meg, hogy: \n
  * 1. Megszámolom, hány változóm van
  * 2. 0 -tól 2^(változó db szám)-1 -ig a számokat bináris számokká konvertálom, ezzel megkapva a bemenetek értékét minden lehetséges módon.
@@ -22,7 +26,7 @@
  * Pl: (((A*!D)+(D*!C))*C) \n
  * (((0*1)+(2*3))*4) \n
  * 
- * \subsection step2 2. Gate* createGate(std::string const& input)
+ * \subsection step2 2. Gate* createGate(std::string const& input, const bool neg)
  * 
  * Ez a függvény felelős azért, hogy adott id-val rendelkező kapu kimeneteket összeköt megfelelő kaputípussal és elhelyezi a gateStacken. \n
  * 
@@ -32,7 +36,7 @@
  * 
  * (0*1) -> And kapu, bemenetei a 0-s és az 1-es id-val rendelkező kapuk. Ezt a kaput elhelyezi a gateStack-ben és visszatér az adott kapu pointerével.
  * 
- * \subsection step3 3. bool containOper(std::string const& in)
+ * \subsection step3 3. bool containOper(std::string const& input)
  * 
  * Segédfüggvény, ha van még a stringben operátor, visszatér true-val;
  * 
@@ -56,9 +60,9 @@
  * 
  * A kapott integert egy "size" bites bináris számmá alakítja. Az num bitjeivel össze "és"-eli az 1-et így megkapjuk, a num-ot binárisan.
  * 
- * \subsection step8 8. bool valueOfBrace(const std::string &brace)
+ * \subsection step8 8. bool valueOfBrace(const std::string &brace, const bool neg)
  * 
- * A kapott zárójeles műveletről mondja meg, hogy igaz-e vagy hamis.
+ * A kapott zárójeles műveletről mondja meg, hogy igaz-e vagy hamis. Ha negált a kapu, az eredmény is negált lesz.
  * 
  * \subsection step9 9. bool evaluateOperation(const std::string &binaryValue, const std::vector<char> &variables, const std::string &operation)
  * 
@@ -86,11 +90,43 @@
  * 5. Or kapu: (A+B) \n 
  * 6. Nor kapu: !(A+B) \n 
  * 
+ * Ezeknek minden kombinációjára, tetszőleges darabszámú változóra működik.
+ * 
  * Mintabemenetek: \n
  * 1. (A*B) \n 
  * 2. ((A*B)+(C*D)+E) \n
  * 3. (((A*B)+!(C*D)+E)*((F*G)+!(H*I)+!J)) \n
  * 4. (((A*B)+(!C*D))+((E*F)+(!G*H))+!((!I*J)+(K*L))) \n
+ * 
+ * \subsection step13 2. Gráf fájl
+ * 
+ * Dot nyelven egy gráfot hoz létre a program és kiírja a $bemenet$.dot fájlba. Fontos, hogy a kiterjesztést nem nekünk kell megadni, azt elintézi a program. Ha telepítve van a Dot nyelv, van egy bővítmény Visual Studio Code-hoz, amellyel meg lehet nyitni a gráfot.
+ * 
+ *  <img src="graf.png">
+ * 
+ * \subsection step14 3. Igazság táblázat fájl
+ * 
+ * Egy standard .txt fájl nevét kell megadni, ebbe fogja létrehozni az igazságtáblázatot ilyen formában:
+ * 
+ *  A	B	C	|	F \n
+ *  0	0	0	|	0 \n
+ *  0	0	1	|	0 \n
+ *  0	1	0	|	0 \n
+ *  0	1	1	|	1 \n
+ *  1	0	0	|	0 \n
+ *  1	0	1	|	0 \n
+ *  1	1	0	|	1 \n
+ *  1	1	1	|	1 \n
+ * 
+ * \section future_opt Fejlesztési lehetőségek:
+ * 
+ * Lehetne akár flipflopokkal bővíteni a hálózatot, azoknak a működését leprogramozni...stb.
+ * 
+ * Lehetne Karnaugh táblát kiííratni, erre kitalálni valami algoritmust, hogy tetszőleges darabszámú változóra működjön.
+ * 
+ * Akár végezhetne számjegyes minimalizálást valamilyen logika mentén.
+ * 
+ * (Illetve egy rendes Not kapu... :) )
  * 
  */
 
@@ -171,6 +207,7 @@ Gate* createInput(const std::string &input) {
  * @brief Id-k segítségével létrehoz egy kaput az operátortól függően. \n
  * \b Bemenet:
  * 1. input: string ami a Value kapu értéke lesz \n
+ * 2. neg: negált-e a kapu \n
  */
 Gate* createGate(const std::string &input, const bool neg) {
     
@@ -432,6 +469,7 @@ std::string toBinary(const int num, const int size) {
  * @brief Segédfüggvény. Egy adott kapu logikai kiértékelését végzi. \n
  * \b Bemenet:
  * 1. brace: stringben eltárolt kapu \n
+ * 2. neg: negált-e a stringben eltárolt kapu \n
  */
 bool valueOfBrace(const std::string &brace, const bool neg) {
     //egy módosítható stringbe átmásolom a kaput
@@ -460,7 +498,7 @@ bool valueOfBrace(const std::string &brace, const bool neg) {
     //helyettesítendő karakterek a stringben
     std::vector<char> toReplace = {'+', '*', '(', ')'};
     
-    //lecserélünk minden fenti vektorban lévő karaktert ' ' karakterre, ezzel lehetővé téve a számok kinyerését
+    //lecserélünk minden fenti vektorban lévő karaktert "space" karakterre, ezzel lehetővé téve a számok kinyerését
     for (char a : toReplace) {
         std::replace(workString.begin(), workString.end(), a, ' ');
     }
