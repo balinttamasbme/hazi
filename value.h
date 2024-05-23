@@ -6,11 +6,10 @@
 class Value : public Gate {
     std::string data;
 public:
-    Value() = default;
+    Value();
     Value(std::string a): Gate(), data(a){}
 
     void setData(char d){data = d;}
 
-    void printInputs() const override;
     void printToFile(std::ofstream&) override;
 };

@@ -22,4 +22,4 @@ $(OUTFILE): $(OBJECTS)
 	$(CC) $(CFLAGS) -c $<
 
 clean:
-	del -f *.o *.dot main.exe output.txt
+	del -f *.o *.dot main.exe tabla.txt

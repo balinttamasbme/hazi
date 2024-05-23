@@ -3,20 +3,19 @@
 #include <iostream>
 #include <fstream>
 #include <vector>
+#include "memtrace.h"
 
 class Gate {
 protected:
-    static int base;
+    /**/
+    static int idBase;
     int id;
 public:
     std::vector<Gate*> inputs;
-    Gate(){id = base++;}
-    Gate( std::vector<Gate*> i): inputs(i){id = base++;}
+
+    Gate(){id = idBase++;}
+    ~Gate() {delete[] &inputs;};
     
     int getId() const {return id;}
-
-    virtual void printInputs() const;
     virtual void printToFile(std::ofstream&);
-    
-    virtual ~Gate() {delete[] &inputs;};
 };
