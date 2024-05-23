@@ -13,7 +13,7 @@
  * 
  * \section github_repo Github Repository
  * 
- * Itt található a teljes kód: 
+ * Itt található a teljes kód: https://github.com/balinttamasbme/hazi
  * 
  * Az igazságérték kiértékelése is hasonlóan történik, csak ott id-k helyett az igazságértékeket helyettesítem be. Ezeket az igazságértékeket úgy kapom meg, hogy: \n
  * 1. Megszámolom, hány változóm van
