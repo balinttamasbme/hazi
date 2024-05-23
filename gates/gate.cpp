@@ -3,4 +3,4 @@
 //statikus idBase beállítása
 int Gate::idBase = 0;
 
-void Gate::printToFile(std::ofstream& of) {}
+void Gate::printToFile(std::ofstream& of) {of << "";}

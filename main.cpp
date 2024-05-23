@@ -147,7 +147,20 @@
 #include "gates/nand.h"
 #include "gates/value.h"
 #include "gateStack.h"
-#include "memtrace.h"
+
+//Function definitions
+bool containOper(const std::string &input);
+Gate* createInput(const std::string &input, GateStack &gateStack);
+Gate* createGate(const std::string &input, const bool neg, GateStack &gateStack);
+Gate* createSystem(const std::string &input, GateStack &gateStack);
+void printGraph(const std::string &fName, Gate *head);
+bool doesInclude(const std::vector<char> &vect, const char toFind);
+std::string toBinary(const int num, const int size);
+bool valueOfBrace(const std::string &brace, const bool neg);
+bool evaluateOperation(const std::string &binaryValue, const std::vector<char> &variables, const std::string &operation);
+void createTable(const std::string &input, const std::string &ofName);
+bool checkInput(const std::string &input);
+void freeStack(GateStack &gateStack);
 
 /**
  * @brief Segédfüggvény. Megvizsgálja, hogy a kapott string tartalmaz e számunkra fontos operátort. \n
@@ -214,7 +227,7 @@ Gate* createGate(const std::string &input, const bool neg, GateStack &gateStack)
     std::string workString = input;
     
     //id-k kinyeréséhez
-    int idIn;
+    unsigned idIn;
     
     //ezeket a vektorokat kell benne lecserélni
     std::vector<char> toReplace = {'+', '*', '(', ')'};
@@ -707,7 +720,7 @@ void createTable(const std::string &input, const std::string &ofName) {
  * \b Bemenet: 
  * 1. input: logikai függvény \n
  */
-bool checkInput(const std::string &input){
+bool checkInput(const std::string &input) {
     //nyitó zárójelek "("
     int openBrac = 0;
 
@@ -738,17 +751,19 @@ bool checkInput(const std::string &input){
 void freeStack(GateStack &gateStack) {
     //A gateStack minden elemét törli.
     for (unsigned i = 0; i <  gateStack.size(); i++) {
-        delete[] gateStack[i];
+        std::cout << gateStack[i] -> getId();
+        delete gateStack[i];
     }
 }
 
 int main() {
     GateStack gateStack;
 
+
     //változók
-    std::string function = "(!A)"; 
-    std::string graphFile = "graf"; 
-    std::string tableFile = "table"; 
+    std::string function; 
+    std::string graphFile; 
+    std::string tableFile; 
 
     std::cout << "Kerem adja meg a halozat fuggvenyet: " << std::endl;
     

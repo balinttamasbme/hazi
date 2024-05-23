@@ -2,7 +2,7 @@
 CC = g++
 
 # Compiler flags
-CFLAGS = -Wall -DMEMTRACE -std=c++11 -O2
+CFLAGS = -Wall -Werror -std=c++11 -O2
 #CFLAGS = -Wall -std=c++11 -O2
 
 # Name of the output file

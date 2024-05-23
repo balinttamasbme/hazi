@@ -16,7 +16,3 @@ void Or::printToFile(std::ofstream& ofStream) {
         ofStream << std::endl << "\t" <<a->getId() << "--" << id << std::endl;
     }
 }
-
-Or::~Or(){
-    inputs.clear();
-};

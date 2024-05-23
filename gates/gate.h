@@ -13,8 +13,7 @@ public:
     std::vector<Gate*> inputs;
 
     Gate(){id = idBase++;}
-    virtual ~Gate() {delete[] &inputs;};
-    
+    virtual ~Gate(){}
     //az algoritmusok helyes működéséhez elengedhetetlen
     int getId() const {return id;}
     std::string getParameters() const{return parameters;}

@@ -12,8 +12,6 @@ public:
 
     unsigned size(){return stack.size();}
 
-    ~GateStack();
-
     Gate* operator[](const unsigned);
 };
 
