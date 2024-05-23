@@ -16,3 +16,7 @@ void And::printToFile(std::ofstream& ofStream) {
         ofStream << std::endl << "\t" <<a->getId() << "--" << id <<std::endl;
     }
 }
+
+And::~And(){
+    inputs.clear();
+};

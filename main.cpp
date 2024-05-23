@@ -96,7 +96,7 @@
  * 1. (A*B) \n 
  * 2. ((A*B)+(C*D)+E) \n
  * 3. (((A*B)+!(C*D)+E)*((F*G)+!(H*I)+!J)) \n
- * 4. (((A*B)+(!C*D))+((E*F)+(!G*H))+!((!I*J)+(K*L))) \n
+ * 4. ((((A*B)+(!C*D))+((E*F)+(!G*H))+!((!I*J)+(K*L)))*(((P*B)+(!O*D))+((N*F)+(!G*Q))+!((!M*R)+(S*T)))) \n
  * 
  * \subsection step13 2. Gráf fájl
  * 
@@ -146,9 +146,8 @@
 #include "gates/and.h"
 #include "gates/nand.h"
 #include "gates/value.h"
-
-//ebbe helyezem el az összes kaput, melyek id-jai megegyeznek a vektorban elfoglalt helyük indexével.
-std::vector<Gate *> gateStack;
+#include "gateStack.h"
+#include "memtrace.h"
 
 /**
  * @brief Segédfüggvény. Megvizsgálja, hogy a kapott string tartalmaz e számunkra fontos operátort. \n
@@ -173,7 +172,7 @@ bool containOper(const std::string &input) {
  * \b Bemenet:
  * 1. input: string ami a Value kapu értéke lesz \n
  */
-Gate* createInput(const std::string &input) {
+Gate* createInput(const std::string &input, GateStack &gateStack) {
     //ez lesz a kapu értékváltozója
     std::string toValue;
 
@@ -209,7 +208,7 @@ Gate* createInput(const std::string &input) {
  * 1. input: string ami a Value kapu értéke lesz \n
  * 2. neg: negált-e a kapu \n
  */
-Gate* createGate(const std::string &input, const bool neg) {
+Gate* createGate(const std::string &input, const bool neg, GateStack &gateStack) {
     
     //egy módosítható stringbe átmásolom a kaput
     std::string workString = input;
@@ -283,7 +282,7 @@ Gate* createGate(const std::string &input, const bool neg) {
  * \b Bemenet:
  * 1. input: string ami a logikai függvényünket tárolja \n
  */
-Gate* createSystem(const std::string &input) {
+Gate* createSystem(const std::string &input, GateStack &gateStack) {
     //egy módosítható stringbe átmásolom a logikai függvényt
     std::string workString = input;
 
@@ -297,12 +296,12 @@ Gate* createSystem(const std::string &input) {
                 //ha negált a bemenetünk, akkor a Value értéke pl.: "A'" lesz
                 inputValue = workString[i-1];
                 inputValue += workString[i];
-                Gate * gotGate = createInput(inputValue);
+                Gate* gotGate = createInput(inputValue, gateStack);
 
                 //hibakezelés
                 if (gotGate != nullptr) {
                     //behelyettesítjük a létrehozott Value kapu id-ját a függvénybe
-                    workString.replace(i-1, 2, std::to_string(createInput(inputValue)->getId()));
+                    workString.replace(i-1, 2, std::to_string(createInput(inputValue, gateStack)->getId()));
                     i = i-1;
                 } else {
                     std::cout << "Hiba a Value letrehozasakor!" << std::endl;
@@ -312,7 +311,7 @@ Gate* createSystem(const std::string &input) {
             } else {
                 //egyébként meg szimplán létrehozza az objektumot
                 inputValue = workString[i];
-                Gate * gotGate = createInput(inputValue);
+                Gate * gotGate = createInput(inputValue, gateStack);
                 
                 //hibakezelés
                 if (gotGate != nullptr) {
@@ -361,7 +360,7 @@ Gate* createSystem(const std::string &input) {
         }
 
         //létrehozzuk a kaput a subGate alapján
-        Gate *toPush = createGate(subGate, neg);
+        Gate *toPush = createGate(subGate, neg, gateStack);
 
         //hibakezelés
         if (toPush != nullptr) {
@@ -401,7 +400,7 @@ void printGraph(const std::string &fName, Gate *head) {
         ofStream << "\tsplines=ortho " << std::endl;
 
         //az objektum fa nyomtató algoritmusa
-        ofStream << head;
+        head->printToFile(ofStream);
 
         //további paraméterek, illetve kimenet "F" hozzáadása, a jobb szemléltethetőség érdekében
         ofStream << "\tF[shape = plaintext]" << std::endl;
@@ -413,6 +412,8 @@ void printGraph(const std::string &fName, Gate *head) {
         std::cout << "Hiba a fajl megnyitasakor" << std::endl;
         return;
     }
+
+    ofStream.close();
 }
 
 /*----------------------------------------------------*/
@@ -485,7 +486,7 @@ bool valueOfBrace(const std::string &brace, const bool neg) {
     bool returnValue;
 
     //a kapu operátorának fajtája
-    char op;
+    char op = ' ';
 
     //megvizsgáljuk, milyen operátor van a kapuban
     for (char a : brace) {
@@ -734,14 +735,16 @@ bool checkInput(const std::string &input){
 /**
  * @brief Felszabadítja a memóriát. A gateStack-en végighalad, töröl minden elemet.
  */
-void freeStack() {
+void freeStack(GateStack &gateStack) {
     //A gateStack minden elemét törli.
-    for (Gate* a : gateStack) {
-        delete[] a;
+    for (unsigned i = 0; i <  gateStack.size(); i++) {
+        delete[] gateStack[i];
     }
 }
 
 int main() {
+    GateStack gateStack;
+
     //változók
     std::string function = "(!A)"; 
     std::string graphFile = "graf"; 
@@ -775,7 +778,7 @@ int main() {
     tableFile += ".txt";
 
     //a kész hálózat teteje
-    Gate* system = createSystem(function);
+    Gate* system = createSystem(function, gateStack);
 
     //a gráf fájlba nyomtatása Graphviz segítségével
     if (system == nullptr) {
@@ -789,7 +792,7 @@ int main() {
     createTable(function, tableFile);
 
     //felszabadítjuk a gateStack vektort
-    freeStack();
+    freeStack(gateStack);
 
     return 0;
 }

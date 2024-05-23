@@ -17,7 +17,10 @@ public:
         parameters += "\"]";
     }
 
+
     void setData(char d){data = d;}
 
     void printToFile(std::ofstream&) override;
+
+    ~Value();
 };

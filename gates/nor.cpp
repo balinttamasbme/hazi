@@ -16,3 +16,7 @@ void Nor::printToFile(std::ofstream& ofStream) {
         ofStream << std::endl << "\t" <<a->getId() << "--" << id << std::endl;
     }
 }
+
+Nor::~Nor(){
+    inputs.clear();
+};

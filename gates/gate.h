@@ -13,7 +13,7 @@ public:
     std::vector<Gate*> inputs;
 
     Gate(){id = idBase++;}
-    ~Gate() {delete[] &inputs;};
+    virtual ~Gate() {delete[] &inputs;};
     
     //az algoritmusok helyes működéséhez elengedhetetlen
     int getId() const {return id;}
@@ -22,5 +22,3 @@ public:
     virtual void printToFile(std::ofstream&);
 
 };
-//fájlba printeléshez
-std::ofstream& operator<<(std::ofstream&, Gate*);

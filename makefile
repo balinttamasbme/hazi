@@ -2,13 +2,14 @@
 CC = g++
 
 # Compiler flags
-CFLAGS = -Wall -std=c++11
+CFLAGS = -Wall -DMEMTRACE -std=c++11 -O2
+#CFLAGS = -Wall -std=c++11 -O2
 
 # Name of the output file
 OUTFILE = main
 
 # Source files
-SOURCES = main.cpp gates/gate.cpp gates/or.cpp gates/nor.cpp gates/nand.cpp gates/and.cpp gates/value.cpp
+SOURCES = main.cpp gateStack.cpp memtrace.cpp gates/gate.cpp gates/or.cpp gates/nor.cpp gates/nand.cpp gates/and.cpp gates/value.cpp 
 
 # Object files
 OBJECTS = $(SOURCES:.cpp=.o)
