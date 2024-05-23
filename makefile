@@ -2,24 +2,32 @@
 CC = g++
 
 # Compiler flags
-CFLAGS = -Wall -DMEMTRACE -std=c++11
+CFLAGS = -Wall -std=c++11
 
 # Name of the output file
 OUTFILE = main
 
 # Source files
-SOURCES = main.cpp gate.cpp or.cpp and.cpp value.cpp memtrace.cpp
+SOURCES = main.cpp gates/gate.cpp gates/or.cpp gates/nor.cpp gates/nand.cpp gates/and.cpp gates/value.cpp
 
 # Object files
 OBJECTS = $(SOURCES:.cpp=.o)
+OBJECTS := $(addprefix oFiles/, $(notdir $(OBJECTS)))
 
 all: $(OUTFILE)
 
 $(OUTFILE): $(OBJECTS)
 	$(CC) $(CFLAGS) -o $(OUTFILE) $(OBJECTS)
 
-%.o: %.cpp
-	$(CC) $(CFLAGS) -c $<
+oFiles/%.o: %.cpp | oFiles
+	$(CC) $(CFLAGS) -c $< -o $@
+
+oFiles/%.o: gates/%.cpp | oFiles
+	$(CC) $(CFLAGS) -c $< -o $@
+
+oFiles:
+	mkdir -p oFiles
 
 clean:
-	del -f *.o *.dot main.exe tabla.txt
+	del *.txt *.dot main.exe
+	cd oFiles && (del /Q *.o 2>NUL)

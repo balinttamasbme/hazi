@@ -10,6 +10,10 @@
  * 2. "(((0*1)+(2*3))*4)" \n
  * 3. "((5+6)*4)" \n
  * 4. "(7*4)" \n
+ * 
+ * Az igazságérték kiértékelése is hasonlóan történik, csak ott id-k helyett az igazságértékeket helyettesítem be. Ezeket az igazságértékeket úgy kapom meg, hogy: \n
+ * 1. Megszámolom, hány változóm van
+ * 2. 0 -tól 2^(változó db szám)-1 -ig a számokat bináris számokká konvertálom, ezzel megkapva a bemenetek értékét minden lehetséges módon.
  * \section install_sec A mainben használt függvények
  * 
  * \subsection step1 1. Gate* createInput(std::string const&  input)
@@ -71,14 +75,22 @@
  * \section use_sec Használat:
  * 
  * \subsection step12 1. Függvény
- * A bemenetként egy zárójelezett bemenet kell legyen, minden szint külön zárójelet igényel.
+ * Minden kaput zárójellel kell jelölni, <b> felesleges zárójelek viszont nem lehetnek benne </b>: \n 
+ * ((A*B) + (B*C)) \n 
+ * \n 
+ * Használható kapuk, jelölésük: \n 
+ * 1. Sima bemenet: A \n 
+ * 2. Negált bemenet: !A \n 
+ * 3. And kapu: (A*B) \n 
+ * 4. Nand kapu: !(A*B) \n 
+ * 5. Or kapu: (A+B) \n 
+ * 6. Nor kapu: !(A+B) \n 
  * 
  * Mintabemenetek: \n
- * (A*B) \n 
- * ((A*B)+(C*D)+E) \n
- * (((A*B)+(C*D)+E)*((F*G)+(H*I)+!J)) \n
- * (((A*B)+(!C*D))+((!E*F)+(G*H))+((!I*J)+(K*L))) \n
- * ((A*B+!C*D*E*(F+!G+H))+(I*!J*K*(L+M*!N*O)*P)+(Q*R*M+!F)+(P*C*I*A)+(C*B*(A*B*C*D*!E*F*G*H*I*J))) \n
+ * 1. (A*B) \n 
+ * 2. ((A*B)+(C*D)+E) \n
+ * 3. (((A*B)+!(C*D)+E)*((F*G)+!(H*I)+!J)) \n
+ * 4. (((A*B)+(!C*D))+((E*F)+(!G*H))+!((!I*J)+(K*L))) \n
  * 
  */
 
@@ -90,11 +102,14 @@
 #include <sstream>
 #include <cmath>
 #include <string>
-#include "gate.h"
-#include "or.h"
-#include "and.h"
-#include "value.h"
-#include "memtrace.h"
+
+//szükséges h fájlok
+#include "gates/gate.h"
+#include "gates/or.h"
+#include "gates/nor.h"
+#include "gates/and.h"
+#include "gates/nand.h"
+#include "gates/value.h"
 
 //ebbe helyezem el az összes kaput, melyek id-jai megegyeznek a vektorban elfoglalt helyük indexével.
 std::vector<Gate *> gateStack;
@@ -117,49 +132,109 @@ bool containOper(const std::string &input) {
     return false;
 }
 
+/**
+ * @brief Az input string értékével létrehoz egy Value objektumot \n
+ * \b Bemenet:
+ * 1. input: string ami a Value kapu értéke lesz \n
+ */
 Gate* createInput(const std::string &input) {
+    //ez lesz a kapu értékváltozója
     std::string toValue;
 
+    //hibakezelés, hibás input esetén nem hoz létre objektumot
     if(input[input.length()-1] >= 'A' && input[input.length()-1] <= 'Z') {
         
+        //ha negált a bemenet "'" karakterrel jelzi ezt az értékénél pl: !A -> A'
         toValue = input[input.length()-1];
         if (input[0] == '!' ) {
             toValue += '\'';
         }
+
+        //létrehozza az objektumot az érték alapján
         Gate *ret = new Value(toValue);
 
-        gateStack.push_back(ret);
-        return ret;
+        //hibakezelés
+        if (ret != nullptr) {
+            gateStack.push_back(ret);
+            return ret;
+        } else {
+            std::cout << "Hiba a Value kapu letrehozasakor" << std::endl;
+            return nullptr;
+        }
     }
 
+    std::cout << "Hibas ertek bemenet" << std::endl;
     return nullptr;
 }
 
-Gate* createGate(const std::string &input) {
+/**
+ * @brief Id-k segítségével létrehoz egy kaput az operátortól függően. \n
+ * \b Bemenet:
+ * 1. input: string ami a Value kapu értéke lesz \n
+ */
+Gate* createGate(const std::string &input, const bool neg) {
+    
+    //egy módosítható stringbe átmásolom a kaput
     std::string workString = input;
+    
+    //id-k kinyeréséhez
     int idIn;
     
+    //ezeket a vektorokat kell benne lecserélni
     std::vector<char> toReplace = {'+', '*', '(', ')'};
-    Gate *ret;
+    
+    //a leendő kapu pointere
+    Gate *ret = nullptr;
 
+    //megnézzük, milyen kaput kell létrehoznunk
     for (char a : workString) {
+        //kapu létrehozása, attól függően, hogy negált-e a kapu, vagy sem
         if (a == '+') {
-            ret = new Or();
-            gateStack.push_back(ret);
+            //Or / Nor kapu létrehozása
+            if (neg) {
+                ret = new Nor();
+            } else {
+                ret = new Or();
+            }
+            
+            //hibakezelés
+            if (ret != nullptr) {
+                gateStack.push_back(ret);
+            } else {
+                std::cout << "Hibas bemenet, hiba a zarojelekkel!" << std::endl;
+                return nullptr;
+            }
+            
             break;
         } else if (a == '*') {
-            ret = new And();
-            gateStack.push_back(ret);
+            //And / Nand kapu létrehozása
+
+            if (neg) {
+                ret = new Nand();
+            } else {
+                ret = new And();
+            }
+            
+            //hibakezelés
+            if (ret != nullptr) {
+                gateStack.push_back(ret);
+            } else {
+                std::cout << "Hibas bemenet, hiba a zarojelekkel!" << std::endl;
+                return nullptr;
+            }
             break;
         }
     }
 
+    //kiszedünk minden számon kívüli karaktert a stringből
     for (char a : toReplace) {
         std::replace(workString.begin(), workString.end(), a, ' ');
     }
 
+    //id-k kinyerése a stringből
     std::stringstream ss(workString);
     while (ss >> idIn) {
+        //majd ezekkel az idkkal rendelkező kapukat hozzárendeljük az imént létrehozott gráfhoz
         ret->inputs.push_back(gateStack[idIn]);
     }
 
@@ -172,7 +247,7 @@ Gate* createGate(const std::string &input) {
  * 1. input: string ami a logikai függvényünket tárolja \n
  */
 Gate* createSystem(const std::string &input) {
-     //egy módosítható stringbe átmásolom a logikai függvényt
+    //egy módosítható stringbe átmásolom a logikai függvényt
     std::string workString = input;
 
     //egy leendő Value kapunak az értéke, melyet a függvényből nyerünk ki
@@ -227,6 +302,9 @@ Gate* createSystem(const std::string &input) {
         int closeBracId = -1;
         int openBracId = -1;
 
+        //negált-e a kapu
+        bool neg = false;
+
         //megkeresi az első záró zárójel előtti utolsó nyitó zárójelet, ezek indexeit elmenti
         while (i < workString.length() && workString[i] != ')' ) {      
             if (workString[i] == '(' ) {
@@ -234,6 +312,11 @@ Gate* createSystem(const std::string &input) {
             }
             closeBracId = ++i;
         }
+
+        if (workString[openBracId - 1] == '!') {
+            neg = true;
+        }
+        
         
         //a fent megtalált kaput kimásolja a gate stringbe
         for (int a = 0; a + openBracId < closeBracId + 1; a++) {
@@ -241,18 +324,17 @@ Gate* createSystem(const std::string &input) {
         }
 
         //létrehozzuk a kaput a subGate alapján
-        Gate *toPush = createGate(subGate);
+        Gate *toPush = createGate(subGate, neg);
 
         //hibakezelés
         if (toPush != nullptr) {
             //behelyettesíti létrehozott kapu id-ját a kapu helyére a stringben
             if (openBracId != -1 && closeBracId != -1) {
-                workString.replace(openBracId, closeBracId - openBracId + 1, std::to_string(toPush->getId()));
+                workString.replace(openBracId - neg, closeBracId - openBracId + 1 + neg, std::to_string(toPush->getId()));
                 
                 //korrigálja az i-t
-                i = i - (closeBracId - openBracId + 1);
+                i = i - (closeBracId - openBracId  + 1) - neg;
             }
-
             i++;
         } else {
             std::cout << "Hiba a kapu letrehozasakor!" << std::endl;
@@ -282,7 +364,7 @@ void printGraph(const std::string &fName, Gate *head) {
         ofStream << "\tsplines=ortho " << std::endl;
 
         //az objektum fa nyomtató algoritmusa
-        head->printToFile(ofStream);
+        ofStream << head;
 
         //további paraméterek, illetve kimenet "F" hozzáadása, a jobb szemléltethetőség érdekében
         ofStream << "\tF[shape = plaintext]" << std::endl;
@@ -346,13 +428,12 @@ std::string toBinary(const int num, const int size) {
     return binaryStr;
 }
 
-
 /**
  * @brief Segédfüggvény. Egy adott kapu logikai kiértékelését végzi. \n
  * \b Bemenet:
  * 1. brace: stringben eltárolt kapu \n
  */
-bool valueOfBrace(const std::string &brace) {
+bool valueOfBrace(const std::string &brace, const bool neg) {
     //egy módosítható stringbe átmásolom a kaput
     std::string workString = brace;
     
@@ -390,6 +471,7 @@ bool valueOfBrace(const std::string &brace) {
         valueStack.push_back(value);
     }
 
+
     //operátor alapján elvégezzük a műveletet, majd visszatérünk annak értékével
     switch (op) {
     case '*':
@@ -398,6 +480,11 @@ bool valueOfBrace(const std::string &brace) {
         for (bool a : valueStack) {
             returnValue *= a;
         }
+
+        if (neg) {
+            return !(bool)returnValue;
+        }
+        
         return (bool)returnValue;
 
     case '+':
@@ -406,6 +493,11 @@ bool valueOfBrace(const std::string &brace) {
         for (bool a : valueStack) {
             returnValue += a;
         }
+
+        if (neg) {
+            return !(bool)returnValue;
+        }
+
         return (bool)returnValue;
 
     default:
@@ -456,6 +548,8 @@ bool evaluateOperation(const std::string &binaryValue, const std::vector<char> &
         
         //a stringen belüli indexeléshez
         unsigned i = 0;
+
+        bool neg = false;
         
         //egy adott kapu, mely már csak operátort és logikai értéket tartalmaz pl: (1*1)
         std::string subGate;
@@ -471,6 +565,11 @@ bool evaluateOperation(const std::string &binaryValue, const std::vector<char> &
             }
             closeBracId = ++i;
         }
+
+        //negált-e a kapu pl: !(A*B)
+        if (workString[openBracId-1] == '!') {
+            neg = true;
+        }
         
         //a fent megtalált kaput kimásolja a subGate stringbe
         for (int a = 0; a + openBracId < closeBracId + 1; a++) {
@@ -479,10 +578,10 @@ bool evaluateOperation(const std::string &binaryValue, const std::vector<char> &
 
         //kiszámolja a subGate-ben található kapura a logikai értéket és visszahelyettesíti azt
         if (openBracId != -1 && closeBracId != -1) {
-            workString.replace(openBracId, closeBracId - openBracId + 1, std::to_string(valueOfBrace(subGate)));
+            workString.replace(openBracId - neg, closeBracId - openBracId + 1 + neg, std::to_string(valueOfBrace(subGate, neg)));
             
             //korrigálja az i-t
-            i = i - (closeBracId - openBracId + 1);
+            i = i - (closeBracId - openBracId + 1) - neg;
         }
 
         i++;
@@ -606,9 +705,9 @@ void freeStack() {
 
 int main() {
     //változók
-    std::string function; 
-    std::string graphFile; 
-    std::string tableFile; 
+    std::string function = "(!A)"; 
+    std::string graphFile = "graf"; 
+    std::string tableFile = "table"; 
 
     std::cout << "Kerem adja meg a halozat fuggvenyet: " << std::endl;
     

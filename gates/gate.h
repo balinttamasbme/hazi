@@ -3,13 +3,12 @@
 #include <iostream>
 #include <fstream>
 #include <vector>
-#include "memtrace.h"
 
 class Gate {
 protected:
-    /**/
     static int idBase;
     int id;
+    std::string parameters;
 public:
     std::vector<Gate*> inputs;
 
@@ -17,5 +16,10 @@ public:
     ~Gate() {delete[] &inputs;};
     
     int getId() const {return id;}
+    std::string getParameters() const{return parameters;}
+
     virtual void printToFile(std::ofstream&);
+
 };
+
+std::ofstream& operator<<(std::ofstream&, Gate*);
